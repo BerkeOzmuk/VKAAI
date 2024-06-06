@@ -2,18 +2,18 @@ import numpy as np
 import math 
 from sklearn import preprocessing
 
-def create_train_dataset():
-    """Creates dataset dataset1.csv""" 
-    return np.genfromtxt('Datasets/dataset1.csv', delimiter=';', usecols=[1,2,3,4,5,6,7], converters={5: lambda s: 0 if s == b"-1" else float(s),
-                                                                                                      7: lambda s:0 if s == b"-1" else float(s)})  
-def create_validation_dataset():
-    """Creates dataset validation1.csv""" 
-    return np.genfromtxt('Datasets/validation1.csv', delimiter=';', usecols=[1,2,3,4,5,6,7], converters={5: lambda s: 0 if s == b"-1" else float(s),
-                                                                                                      7: lambda s:0 if s == b"-1" else float(s)})  
-def create_dataset_days(): 
-    """Creates dataset days.csv""" 
-    return np.genfromtxt('Datasets/days.csv', delimiter=';', usecols=[1,2,3,4,5,6,7], converters={5: lambda s: 0 if s == b"-1" else float(s),
-                                                                                                      7: lambda s:0 if s == b"-1" else float(s)})   
+def create_datasets(dataset):
+    return dataset
+    
+def normalize_train_validation_datasets(data, validation_data):
+    """Normalizes a dataset using the min-max formula.csv""" 
+    min = np.min(data)
+    max = np.max(data)
+
+    normalized_data = [(x - min) / (max - min) for x in data] #https://rayobyte.com/blog/how-to-normalize-data-in-python/
+    normalized_validation_data = [(x - min) / (max - min) for x in validation_data] #https://rayobyte.com/blog/how-to-normalize-data-in-python/
+    return normalized_data, normalized_validation_data 
+
 def normalize_datasets(dataset):
     """Normalizes a dataset using the min-max formula.csv""" 
     min_value = np.min(dataset)
@@ -83,13 +83,15 @@ def best_k(data, validation_data, labels, validation_labels):
     
 def main():
     """This is the main :p"""
-    data   = normalize_datasets(create_train_dataset())
-    validation_data   = normalize_datasets(create_validation_dataset())
+    data, validation_data   = normalize_train_validation_datasets(create_datasets(np.genfromtxt('Datasets/dataset1.csv', delimiter=';', usecols=[1,2,3,4,5,6,7], converters={5: lambda s: 0 if s == b"-1" else float(s),
+                                                                                                      7: lambda s:0 if s == b"-1" else float(s)})), create_datasets(np.genfromtxt('Datasets/validation1.csv', delimiter=';', usecols=[1,2,3,4,5,6,7], converters={5: lambda s: 0 if s == b"-1" else float(s),
+                                                                                                      7: lambda s:0 if s == b"-1" else float(s)})))  
     
     labels = create_labels_seasons(np.genfromtxt('Datasets/dataset1.csv', delimiter=';', usecols=[0]))
     validation_labels = create_labels_seasons(np.genfromtxt('Datasets/validation1.csv', delimiter=';', usecols=[0]))
 
-    days = create_dataset_days()
+    days = normalize_datasets(create_datasets(np.genfromtxt('Datasets/days.csv', delimiter=';', usecols=[1,2,3,4,5,6,7], converters={5: lambda s: 0 if s == b"-1" else float(s),
+                                                                                                      7: lambda s:0 if s == b"-1" else float(s)})))
 
     bestK= best_k(data, validation_data, labels, validation_labels)
 
